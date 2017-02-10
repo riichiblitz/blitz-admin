@@ -422,6 +422,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
     public void checkPlayers(ArrayList<String> playersToCheck) {
         Log.d("MainProvider", "checkPlayers()");
         if (isCheckingPlayers) {
+            Log.d("MainProvider", "isCheckingPlayers == true, stop checking");
             return;
         }
         isCheckingPlayers = true;
@@ -434,6 +435,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
         Log.d("MainProvider", "onPlayersChecked()");
         // calling from WAIT or PAUSE
         if (isCheckingPlayers && !isCheckingLastPlayers) {
+            Log.d("MainProvider", "isCheckingPlayers == true, isCheckingLastPlayers == false, allgood");
             checkedPlayers.clear();
             for (String idlePlayer : idlePlayers) {
                 if (playersToCheck.remove(idlePlayer)) {
@@ -441,9 +443,11 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
                 }
             }
             if (playersToCheck.size() == 0 || (idlePlayers.size() + playingPlayers.size()) < 56) {
+                Log.d("MainProvider", "onPlayersChecked: players checked, send them back");
                 sendPlayers(checkedPlayers);
                 isCheckingPlayers = false;
             } else {
+                Log.d("MainProvider", "onPlayersChecked: not all players are checked");
                 isCheckingLastPlayers = true;
                 checkLastPlayers();
             }
@@ -475,6 +479,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
     private void checkLastPlayers() {
         Log.d("MainProvider", "checkLastPlayers()");
         if (playersToCheck.size() == 0) {
+            Log.d("MainProvider", "checkLastPlayers: players checked, send them back");
             sendPlayers(checkedPlayers);
             isCheckingPlayers = false;
             isCheckingLastPlayers = false;
