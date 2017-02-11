@@ -44,9 +44,9 @@ public class Log {
         }
 
         String logName = "log-" + DATE_TIME_FORMAT.format(new Date()) + ".txt";
-        System.out.print("New log file: " + logName +"... ");
 
         File file = new File(logName);
+        System.out.print("New log file: " + file.getAbsolutePath() +"... ");
         try {
             writer = new FileWriter(file);
             System.out.println("OK");
