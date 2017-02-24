@@ -167,7 +167,7 @@ public class Starter {
         // R2=074F - hanchan with some type of ratings (#END 名まで(+64.8,+2枚) Csan(-4.3,-1枚) Dsan(-24.3,+0枚) Bsan(-36.2,-1枚) )
         // R2=0001 - tonpuusen without ratings (#END 名まで(+15.9) Csan(-4.3) Bsan(-4.3) Dsan(-7.3))
         // R2=0009 - hanchan with aka and without ratings
-        body.append("L=").append(lobby).append("&R2=0001&RND=default&WG=1&M=");
+        body.append("L=").append(lobby).append("&R2=0009&RND=default&WG=1&M=");
         try {
             for (int i = 0, size = players.size(); i < size; i++) {
                 body.append(URLEncoder.encode(players.get(i), "UTF-8"));
