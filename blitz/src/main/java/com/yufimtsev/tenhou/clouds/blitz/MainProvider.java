@@ -619,7 +619,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
         Status status = TournamentState.getInstance().getStatus();
         status.status = STATUS_PLAY_ALL;
         status.time = new Date().getTime() + TimeUnit.HOURS.toMillis(3);
-        status.delay = 60000;
+        status.delay = 20000;
         BlitzApi.getInstance().setStatus(status).compose(UiTransform.getInstance())
                 .subscribe(new Action1<BaseResponse<Void>>() {
                     @Override
