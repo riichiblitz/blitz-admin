@@ -687,7 +687,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
                                                     BlitzApi.getInstance().setStatus(status).compose(UiTransform.getInstance())
                                                             .subscribe(this);
                                                 } else {
-                                                    sendPing(TimeUnit.MINUTES.toMillis(2));
+                                                    sendPing(TimeUnit.SECONDS.toMillis(10));
                                                 }
                                             }
                                         });
