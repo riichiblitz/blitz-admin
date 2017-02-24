@@ -1,5 +1,6 @@
 package com.yufimtsev.tenhou.clouds.blitz.model;
 
+import com.yufimtsev.tenhou.clouds.blitz.MainProvider;
 import com.yufimtsev.tenhou.clouds.blitz.network.BlitzApi;
 import com.yufimtsev.tenhou.clouds.blitz.network.request.BasePostBody;
 import com.yufimtsev.tenhou.clouds.blitz.network.response.BaseResponse;
@@ -19,6 +20,7 @@ import rx.functions.Action1;
 public class ReplayHelper {
 
     private static boolean lock = false;
+    private static ArrayList<String> pendingHashes = new ArrayList<>();
 
     public static void proceedReplays() {
         if (lock) return;
@@ -26,6 +28,11 @@ public class ReplayHelper {
         new Thread() {
             @Override
             public void run() {
+                for (int i = 0; i < pendingHashes.size(); i++) {
+                    if (proceedHash(pendingHashes.get(i))) {
+                        i--;
+                    }
+                }
                 BlitzApi.getInstance().getNewReplays(new BasePostBody()).onErrorReturn(t -> null)
                         .subscribe(new Action1<BaseResponse<ArrayList<Replay>>>() {
                             @Override
@@ -42,57 +49,7 @@ public class ReplayHelper {
                                             response.data.remove(i--);
                                             continue;
                                         }
-                                        ArrayList<String> players = null;
-                                        try {
-                                            players = getPlayers(hash);
-                                        } catch (IOException e) {
-                                            continue;
-                                        }
-
-                                        ArrayList<Long> playerIds = new ArrayList<>();
-                                        for (String player : players) {
-                                            playerIds.add(TournamentState.getInstance().getPlayerIdByName(player));
-                                        }
-                                        ArrayList<GameEntity> games = TournamentState.getInstance().getGames();
-                                        Integer state = null;
-                                        for (int j = 0; j < games.size(); j += Constants.PLAYER_PER_TABLE) {
-                                            boolean found = true;
-                                            int noNames = 0;
-                                            for (int k = 0; k < Constants.PLAYER_PER_TABLE; k++) {
-                                                long playerInGame = games.get(j + k).playerId;
-                                                if (playerInGame == 0L) {
-                                                    noNames++;
-                                                } else if (!playerIds.contains(playerInGame)) {
-                                                    found = false;
-                                                    break;
-                                                }
-                                            }
-                                            if (noNames < Constants.PLAYER_PER_TABLE && found) {
-                                                if (state != null) {
-                                                    state = null;
-                                                    break;
-                                                } else {
-                                                    state = j;
-                                                }
-                                            }
-                                        }
-                                        if (state != null) {
-                                            GameEntity game = games.get(state);
-                                            Replay processed = new Replay();
-                                            processed.url = hash;
-                                            processed.round = game.round;
-                                            processed.board = game.board;
-                                            BlitzApi.getInstance().sendReplay(processed).onErrorReturn(t -> null)
-                                                    .subscribe(new Action1<BaseResponse<Void>>() {
-                                                        @Override
-                                                        public void call(BaseResponse<Void> baseResponse) {
-                                                            if (baseResponse == null) {
-                                                                BlitzApi.getInstance().sendReplay(processed).onErrorReturn(t -> null)
-                                                                        .subscribe(this);
-                                                            }
-                                                        }
-                                                    });
-                                        }
+                                        proceedHash(hash);
                                     }
                                     lock = false;
                                 }
@@ -103,7 +60,8 @@ public class ReplayHelper {
     }
 
     public static String getHash(String url) {
-        if (!url.contains("-0009-19070-")) {
+        //check desired lobby and game type
+        if (!url.contains("-1" + MainProvider.LOBBY.substring(1, 5) + "-") || (!url.contains("-0009-") && !url.contains("-0001-"))) {
             return null;
         }
         Pattern pattern = Pattern.compile("\\?log=([^&\\n ]+)");
@@ -112,6 +70,67 @@ public class ReplayHelper {
             return null;
         }
         return matcher.group(1);
+    }
+
+    private static boolean proceedHash(String hash) {
+        pendingHashes.remove(hash);
+        ArrayList<String> players = null;
+        try {
+            players = getPlayers(hash);
+        } catch (IOException e) {
+            pendingHashes.add(hash);
+            return false;
+        }
+        if (players.isEmpty()) {
+            pendingHashes.add(hash);
+            return false;
+        }
+
+        ArrayList<Long> playerIds = new ArrayList<>();
+        for (String player : players) {
+            playerIds.add(TournamentState.getInstance().getPlayerIdByName(player));
+        }
+        ArrayList<GameEntity> games = TournamentState.getInstance().getGames();
+        Integer state = null;
+        for (int j = 0; j < games.size(); j += Constants.PLAYER_PER_TABLE) {
+            boolean found = true;
+            int noNames = 0;
+            for (int k = 0; k < Constants.PLAYER_PER_TABLE; k++) {
+                long playerInGame = games.get(j + k).playerId;
+                if (playerInGame == 0L) {
+                    noNames++;
+                } else if (!playerIds.contains(playerInGame)) {
+                    found = false;
+                    break;
+                }
+            }
+            if (noNames < Constants.PLAYER_PER_TABLE && found) {
+                if (state != null) {
+                    state = null;
+                    break;
+                } else {
+                    state = j;
+                }
+            }
+        }
+        if (state != null) {
+            GameEntity game = games.get(state);
+            Replay processed = new Replay();
+            processed.url = hash;
+            processed.round = game.round;
+            processed.board = game.board;
+            BlitzApi.getInstance().sendReplay(processed).onErrorReturn(t -> null)
+                    .subscribe(new Action1<BaseResponse<Void>>() {
+                        @Override
+                        public void call(BaseResponse<Void> baseResponse) {
+                            if (baseResponse == null) {
+                                BlitzApi.getInstance().sendReplay(processed).onErrorReturn(t -> null)
+                                        .subscribe(this);
+                            }
+                        }
+                    });
+        }
+        return true;
     }
 
     public static ArrayList<String> getPlayers(String hash) throws IOException {
@@ -125,6 +144,9 @@ public class ReplayHelper {
         }
         string = replayResponse.body().string();
         replayResponse.body().close();
+        if (string.length() < 50) {
+            return result;
+        }
         Document document = Jsoup.parse(string);
         Element un = document.getElementsByTag("un").first();
         result.add(URLDecoder.decode(un.attr("n0"), "UTF-8"));

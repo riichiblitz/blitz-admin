@@ -59,6 +59,10 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
     private Timer updateTimer;
 
     public void start(String lobby, String callbackUrl) {
+        LobbyService instance = LobbyService.getInstance();
+        if (instance != null) {
+            instance.setOnGameEndedCallback(this);
+        }
         Log.d("MainProvider", "start()");
         LOBBY = lobby;
         CALLBACK_URL = callbackUrl;
