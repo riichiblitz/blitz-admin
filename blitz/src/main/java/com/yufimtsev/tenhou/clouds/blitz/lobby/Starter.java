@@ -54,59 +54,14 @@ public class Starter {
             board++;
             incrementGamesCounter();
             final ArrayList<String> namesOnBoard = new ArrayList<>(4);
-            int placeSum = 0;
             final ArrayList<Integer> startPoints = new ArrayList<>(4);
-            ArrayList<Integer> partPlacesSum = new ArrayList<>(4);
-            ArrayList<Integer> partPlacesSumRemovable = new ArrayList<>(4);
             for (Long playerId : seating) {
                 games.add(new GameEntity(TournamentState.getInstance().getStatus().round, board, playerId, null));
                 namesOnBoard.add(TournamentState.getInstance().getPlayerNameById(playerId));
-                Integer playerPlaces = TournamentState.getInstance().getPlaceSum(playerId);
-                partPlacesSum.add(playerPlaces);
-                partPlacesSumRemovable.add(playerPlaces);
-                placeSum += playerPlaces;
-                startPoints.add(0);
+                startPoints.add(1000);
             }
 
-            int scoresSum = 100000;
-            while (partPlacesSumRemovable.size() > 0) {
-
-                int maxPlaces = Collections.max(partPlacesSumRemovable);
-                int minPlaces = Collections.min(partPlacesSumRemovable);
-
-                int points;
-
-                if (maxPlaces == minPlaces) {
-                    points = scoresSum / partPlacesSumRemovable.size();
-                } else {
-                    points = 100000 * maxPlaces / placeSum;
-                }
-
-                points = points / 100;
-                points = points * 100;
-
-                for (int i = 0; i < partPlacesSum.size(); i++) {
-                    if (partPlacesSum.get(i) == maxPlaces) {
-                        startPoints.remove(i);
-                        startPoints.add(i, points);
-                        scoresSum -= points;
-                    }
-                }
-                for (int i = 0; i < partPlacesSum.size(); i++) {
-                    partPlacesSumRemovable.remove(Integer.valueOf(maxPlaces));
-                }
-            }
-            if (scoresSum > 0) {
-                int maxPlaces = Collections.max(partPlacesSum);
-                for (int i = 0; i < partPlacesSum.size(); i++) {
-                    if (partPlacesSum.get(i) == maxPlaces) {
-                        startPoints.add(i, startPoints.remove(i) + scoresSum);
-                        break;
-                    }
-                }
-            }
-
-            startGame(MainProvider.LOBBY, null, namesOnBoard, startPoints, new IStarterCallback() {
+            startGame(MainProvider.LOBBY, null, namesOnBoard, null, new IStarterCallback() {
                 @Override
                 public void onGameStarted(ArrayList<String> players) {
                     ArrayList<Long> playerIds = new ArrayList<>();

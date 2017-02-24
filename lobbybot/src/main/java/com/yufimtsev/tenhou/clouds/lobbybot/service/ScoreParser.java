@@ -1,7 +1,5 @@
 package com.yufimtsev.tenhou.clouds.lobbybot.service;
 
-import com.yufimtsev.tenhou.clouds.lobbybot.service.ResultBody;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -17,7 +15,7 @@ public class ScoreParser {
             Matcher matcher = pattern.matcher(players[i]);
             matcher.find();
             float score = Float.parseFloat(matcher.group(2).split(",")[0]);
-            result.add(new ResultBody(matcher.group(1), Math.round(score * 1000 + 25000)));
+            result.add(new ResultBody(matcher.group(1), Math.round(score * 1000 + 1000)));
         }
         Collections.sort(result);
         Collections.reverse(result);
