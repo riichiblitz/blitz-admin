@@ -17,7 +17,7 @@ public class ScoreParser {
             Matcher matcher = pattern.matcher(players[i]);
             matcher.find();
             float score = Float.parseFloat(matcher.group(2).split(",")[0]);
-            result.add(new ResultBody(matcher.group(1), Math.round(score * 1000 + 25000)));
+            result.add(new ResultBody(matcher.group(1), Math.round(score * 1000 + 30000)));
         }
         Collections.sort(result);
         Collections.reverse(result);

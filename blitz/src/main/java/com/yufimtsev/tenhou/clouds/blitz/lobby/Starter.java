@@ -158,7 +158,6 @@ public class Starter {
                 }
             }
         }
-
         starting = false;
         callback.gamesStarted(entities, notFound, pendingBoards);
     }
