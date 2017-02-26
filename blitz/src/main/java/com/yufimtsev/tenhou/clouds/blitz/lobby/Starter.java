@@ -123,7 +123,7 @@ public class Starter {
         // R2=0001 - tonpuusen without ratings (#END 名まで(+15.9) Csan(-4.3) Bsan(-4.3) Dsan(-7.3))
         // R2=0009 - hanchan with aka and without ratings
         // R2=0003 - tonpusen without aka and without ratings
-        body.append("L=").append(lobby).append("&R2=0011&RND=default&WG=1&M=");
+        body.append("L=").append(lobby).append("&R2=000B&RND=default&WG=1&M=");
         try {
             for (int i = 0, size = players.size(); i < size; i++) {
                 body.append(URLEncoder.encode(players.get(i), "UTF-8"));
