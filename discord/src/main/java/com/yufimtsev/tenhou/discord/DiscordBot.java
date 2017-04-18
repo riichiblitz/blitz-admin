@@ -134,7 +134,7 @@ public class DiscordBot {
     public void debugMoveToMute(String discordName, String discriminator) {
         IUser user = findUserByName(discordName, discriminator);
         if (user != null) {
-            moveUserToChannel(user, muteChannel);
+            moveUserToChannel(user, getMuteChannel());
         }
     }
 
