@@ -39,4 +39,5 @@ jar {
         exclude 'META-INF/*.RSA'
     }
 }
+
 task stage(dependsOn: ['clean', 'installDist'])
