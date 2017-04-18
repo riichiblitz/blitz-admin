@@ -4,4 +4,5 @@ include 'logger'
 include 'blitz'
 include 'lobbybot'
 include 'blitzserver'
+include 'discord'
 

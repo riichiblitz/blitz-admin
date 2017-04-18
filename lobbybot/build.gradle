@@ -12,4 +12,5 @@ repositories {
 dependencies {
     compile project(':logger')
     compile project(':client')
+    compile project(':discord')
 }

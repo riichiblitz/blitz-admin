@@ -5,6 +5,7 @@ import com.yufimtsev.tenhou.clouds.client.UserState;
 import com.yufimtsev.tenhou.clouds.client.callback.IOnChatMessageReceived;
 import com.yufimtsev.tenhou.clouds.client.callback.IOnStateChangedCallback;
 import com.yufimtsev.tenhou.clouds.logger.Log;
+import com.yufimtsev.tenhou.discord.DiscordBot;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +21,7 @@ public class LobbyService implements IOnStateChangedCallback, IOnChatMessageRece
     private Timer swapTimer;
 
     boolean isActive = false;
-    boolean isTsumi = false;
+    boolean isTsumi = true;
 
     private Client client;
 
@@ -40,7 +41,7 @@ public class LobbyService implements IOnStateChangedCallback, IOnChatMessageRece
                         switch (state) {
                             case CONNECTED:
                                 Log.d("LobbyService", "Loggin with TSUMI? " + isTsumi);
-                                nextClient.authenticate(isTsumi ? "ID56D2786B-2RhbfBFW" : "ID03261FDC-WXGADJBB", null);
+                                nextClient.authenticate(isTsumi ? "ID56D2786B-2RhbfBFW" : "ID6B11619B-HPDJJh2H", null);
                                 isTsumi = !isTsumi;
                                 break;
                             case IDLE:
@@ -144,6 +145,9 @@ public class LobbyService implements IOnStateChangedCallback, IOnChatMessageRece
                     fullList.addAll(wishedPlayers);
                     wishAddedCallback.onWishAdded(fullList);
                 }
+            } else if (line.contains("Ｍａｔｔｅ: #mute ")) {
+                String[] data = line.split(" ");
+                DiscordBot.getInstance().debugMoveToMute(data[2], data[3]);
             } else if (line.startsWith("#END")) {
                 ArrayList<ResultBody> results = ScoreParser.parseResult(line);
                 if (gameEndedCallback != null) {

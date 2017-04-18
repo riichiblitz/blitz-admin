@@ -13,6 +13,7 @@ import com.yufimtsev.tenhou.clouds.blitz.network.response.BaseResponse;
 import com.yufimtsev.tenhou.clouds.blitz.network.response.Status;
 import com.yufimtsev.tenhou.clouds.lobbybot.service.*;
 import com.yufimtsev.tenhou.clouds.logger.Log;
+import com.yufimtsev.tenhou.discord.DiscordBot;
 import rx.functions.Action1;
 
 import java.util.*;
@@ -63,6 +64,12 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
         if (instance != null) {
             instance.setOnGameEndedCallback(this);
         }
+        new Thread() {
+            @Override
+            public void run() {
+                DiscordBot.getInstance().start();
+            }
+        }.start();
         Log.d("MainProvider", "start()");
         LOBBY = lobby;
         CALLBACK_URL = callbackUrl;
@@ -87,6 +94,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
                             BlitzApi.getInstance().getInitialState(new BasePostBody()).compose(UiTransform.getInstance())
                                     .subscribe(this);
                         } else {
+                            syncDiscordState(initialState.data);
                             BlitzApi.getInstance().getPlayers(new BasePostBody()).compose(UiTransform.getInstance())
                                     .subscribe(new Action1<BaseResponse<ArrayList<Player>>>() {
                                         @Override
@@ -112,6 +120,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
         Log.d("MainProvider", "stop()");
         cancelPing();
         LobbyService.getInstance().stopClient();
+        DiscordBot.getInstance().stop();
     }
 
     private void updatePendingBoards(BaseResponse<InitialState> initialState) {
@@ -254,6 +263,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
                                                 BlitzApi.getInstance().getInitialState(new BasePostBody()).compose(UiTransform.getInstance())
                                                         .subscribe(this);
                                             } else {
+                                                syncDiscordState(response.data);
                                                 startGames(response.data);
                                             }
                                         }
@@ -555,13 +565,16 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
                 if (entity.playerId != 0L && entity.startPoints != null) {
                     ArrayList<GameEntity> addedSeating = new ArrayList<>();
                     ArrayList<Long> startedTable = new ArrayList<>();
+                    ArrayList<String> players = new ArrayList<>();
                     for (int k = 0; k < Constants.PLAYER_PER_TABLE; k++) {
                         GameEntity e = games.get(i + k);
                         addedSeating.add(e);
                         startedTable.add(e.playerId);
+                        players.add(TournamentState.getInstance().getPlayerNameById(e.playerId));
                     }
                     TournamentState.getInstance().insertSeating(addedSeating);
                     TournamentState.getInstance().gameStarted(startedTable);
+                    DiscordBot.getInstance().gameStarted(addedSeating.get(0).board, players);
                     break;
                 }
             }
@@ -641,13 +654,23 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
         // and check if all the games are ended already
         ArrayList<GameEntity> result = new ArrayList<>();
         ArrayList<Long> table = new ArrayList<>();
+        int currentRound = TournamentState.getInstance().getStatus().round;
+        long anyRealPlayerId = 0;
         for (ResultBody resultBody : results) {
             long playerId = TournamentState.getInstance().getPlayerIdByName(resultBody.name);
             if (playerId != 0) {
-                result.add(new GameEntity(TournamentState.getInstance().getStatus().round, playerId, resultBody.score, resultBody.place));
+                anyRealPlayerId = playerId;
+                result.add(new GameEntity(currentRound, playerId, resultBody.score, resultBody.place));
             }
             table.add(playerId);
         }
+        for (GameEntity game : TournamentState.getInstance().getGames()) {
+            if (game.round == currentRound && game.playerId == anyRealPlayerId) {
+                DiscordBot.getInstance().gameEnded(game.board);
+                break;
+            }
+        }
+
         BlitzApi.getInstance().gameEnded(new ResultsPostBody(result)).compose(UiTransform.getInstance())
                 .subscribe(new Action1<BaseResponse<Void>>() {
                     @Override
@@ -784,6 +807,15 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
         cancelPing();
         updateTimer = new Timer();
         updateTimer.schedule(newTimerTask(), delay);
+    }
+
+    private void syncDiscordState(InitialState state) {
+        for (Player player : state.players) {
+            if (player.discordName != null && player.discriminator != null) {
+                DiscordBot.getInstance().setAlias(player.name, player.discordName.trim(), player.discriminator.trim());
+            }
+        }
+        int a = 0;
     }
 
 

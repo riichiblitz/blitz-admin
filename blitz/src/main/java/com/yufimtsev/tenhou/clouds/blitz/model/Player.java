@@ -5,6 +5,9 @@ public class Player {
     public long id;
     public String name;
     public Integer placeSum;
+    public String discordName;
+    public String discriminator;
+    public String offline;
 
     public Player(String name) {
         id = 0;

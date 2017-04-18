@@ -33,6 +33,22 @@ public class Log {
         System.out.println(logMessage);
     }
 
+    public static void d(String tag, Exception exception) {
+        if (++logCounter > MAX_LOG_PER_FILE) {
+            resetLogFile();
+        }
+        String logMessage = DATE_TIME_FORMAT.format(new Date()) + " " + tag + ": EXCEPTION";
+        exception.printStackTrace();
+        try {
+            writer.append(logMessage);
+            writer.append(exception.getMessage());
+        } catch (IOException e) {
+            System.out.println("COULD NOT APPEND TO LOGFILE");
+            resetLogFile();
+        }
+        System.out.println(logMessage);
+    }
+
     public static void resetLogFile() {
         if (writer != null) {
             try {

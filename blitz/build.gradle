@@ -12,6 +12,7 @@ repositories {
 dependencies {
     compile project(':logger')
     compile project(':lobbybot')
+    compile project(':discord')
 
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
