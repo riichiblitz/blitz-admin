@@ -1,7 +1,6 @@
 package com.yufimtsev.tenhou.discord;
 
 import com.yufimtsev.tenhou.clouds.logger.Log;
-import javafx.util.Pair;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.*;
