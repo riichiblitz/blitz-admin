@@ -29,6 +29,6 @@ dependencies {
     compile "com.googlecode.soundlibs:tritonus-share:0.3.7.4"
     compile "org.tritonus:tritonus-dsp:0.3.6"
 
-    compile "com.github.austinv11:Discord4j:2.7.0"
+    compile 'com.github.austinv11:discord4j:2.7.0'
     compile project(':logger')
 }
