@@ -1,69 +1,32 @@
 package com.yufimtsev.tenhou.clouds.blitz.heroku;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import com.yufimtsev.tenhou.clouds.blitz.MainProvider;
+import com.yufimtsev.tenhou.clouds.blitz.bot.BotApi;
+import com.yufimtsev.tenhou.clouds.blitz.model.Replay;
 import com.yufimtsev.tenhou.clouds.blitz.network.BlitzApi;
+import com.yufimtsev.tenhou.clouds.blitz.network.UiTransform;
 import com.yufimtsev.tenhou.clouds.logger.Log;
-import okhttp3.*;
+
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class BotRunner {
 
-    private static final String[] pingBots = new String[]{
-            "https://enigmatic-gorge-52008.herokuapp.com/info?id=0",
-            "https://evening-brushlands-66717.herokuapp.com/info?id=0",
-            "https://immense-wave-10390.herokuapp.com/info?id=0",
-            "https://pacific-inlet-75025.herokuapp.com/info?id=0",
-            "http://frozen-oasis-89748.herokuapp.com/info?id=0",
-            "http://infinite-headland-96718.herokuapp.com/info?id=0",
-            "http://pacific-springs-87245.herokuapp.com/info?id=0",
-            "http://peaceful-beach-57299.herokuapp.com/info?id=0",
-            "http://pure-refuge-17376.herokuapp.com/info?id=0",
-            "http://mahjongbot.herokuapp.com/info?id=0",
-    };
+    private static final ArrayList<BotApi> bots = new ArrayList<>();
 
-    private static String[] bots = generateUrls();
-
-    private static OkHttpClient redirectClient = new OkHttpClient.Builder().followRedirects(true).build();
-
-    private static String[] generateUrls() {
-        return new String[]{
-                "https://enigmatic-gorge-52008.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-                "https://evening-brushlands-66717.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-                "https://immense-wave-10390.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-                "https://pacific-inlet-75025.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-                "http://frozen-oasis-89748.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-                "http://infinite-headland-96718.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-                "http://pacific-springs-87245.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-                "http://peaceful-beach-57299.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-                "http://pure-refuge-17376.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-                "http://mahjongbot.herokuapp.com/startBot?lobby=" + MainProvider.LOBBY.substring(0, 9),
-        };
+    static {
+        // mateplaysmahjong
+        bots.add(new BotApi("http://vast-shelf-53916.herokuapp.com/"));
+        bots.add(new BotApi("http://damp-dawn-64264.herokuapp.com/"));
+        bots.add(new BotApi("http://blooming-tor-57149.herokuapp.com/"));
+        bots.add(new BotApi("http://morning-brook-51068.herokuapp.com/"));
+        bots.add(new BotApi("http://mysterious-hamlet-82283.herokuapp.com/"));
     }
 
     private static long lastTime = 0;
 
     public static void pingBots() {
         Log.d("BotRunner", "pingBots()");
-        new Thread() {
-            @Override
-            public void run() {
-                for (String bot : pingBots) {
-                    redirectClient.newCall(new Request.Builder().url(bot).build()).enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-
-                        }
-
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            response.close();
-                        }
-                    });
-                }
-            }
-        }.start();
+        bots.forEach(BotApi::ping);
     }
 
     public static void runBots() {
@@ -73,23 +36,20 @@ public class BotRunner {
             return;
         }
         lastTime = now;
-        new Thread() {
-            @Override
-            public void run() {
-                for (String bot : bots) {
-                    redirectClient.newCall(new Request.Builder().url(bot).build()).enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
+        bots.forEach(BotApi::checkOrStart);
+    }
 
-                        }
-
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            response.close();
-                        }
-                    });
-                }
+    public static void sendReplays() {
+        bots.forEach(bot -> {
+            String logHash = bot.getLastReplay();
+            if (logHash != null) {
+                Replay replay = new Replay();
+                replay.payload = null;
+                replay.url = "http://tenhou.net/0/?log=" + logHash + "&tw=0";
+                replay.cheat = 0;
+                BlitzApi.getInstance().sendReplay(replay).compose(UiTransform.getInstance())
+                        .subscribe();
             }
-        }.start();
+        });
     }
 }

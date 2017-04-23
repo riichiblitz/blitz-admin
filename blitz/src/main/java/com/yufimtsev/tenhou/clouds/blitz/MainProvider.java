@@ -690,6 +690,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
         // if all of the games are ended - unconfirm all the players
         // then set status to PAUSE with next time, and ping backend later
         if (TournamentState.getInstance().gameEnded(endedGame)) {
+            BotRunner.sendReplays();
             final Status status = TournamentState.getInstance().getStatus();
             status.status = STATUS_PAUSE;
             status.time = new Date().getTime() + Constants.PAUSE_DELAYS[status.round - 1];
