@@ -7,6 +7,7 @@ import com.yufimtsev.tenhou.clouds.blitz.network.UiTransform;
 import com.yufimtsev.tenhou.clouds.logger.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class BotRunner {
@@ -51,5 +52,12 @@ public class BotRunner {
                         .subscribe();
             }
         });
+    }
+
+
+    public static List<String> getCheckUrls() {
+        final ArrayList<String> result = new ArrayList<>();
+        bots.forEach(bot -> result.add(bot.getCheckUrl()));
+        return result;
     }
 }

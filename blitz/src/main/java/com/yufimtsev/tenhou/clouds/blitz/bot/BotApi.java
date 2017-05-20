@@ -12,11 +12,13 @@ public class BotApi {
 
     private static OkHttpClient sClient;
 
+    private final String baseUrl;
     private final IBotApi api;
     private String lastId = null;
     private String lastReplay = null;
 
     public BotApi(String baseUrl) {
+        this.baseUrl = baseUrl;
         api = newInstance(baseUrl);
     }
 
@@ -92,5 +94,12 @@ public class BotApi {
                     lastId = null;
                     lastReplay = null;
                 });
+    }
+
+    public String getCheckUrl() {
+        if (lastId == null) {
+            return null;
+        }
+        return baseUrl + "info?id=" + lastId;
     }
 }

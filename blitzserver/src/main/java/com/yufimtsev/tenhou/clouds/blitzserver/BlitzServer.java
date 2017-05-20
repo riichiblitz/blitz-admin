@@ -1,6 +1,8 @@
 package com.yufimtsev.tenhou.clouds.blitzserver;
 
+import com.google.gson.Gson;
 import com.yufimtsev.tenhou.clouds.blitz.MainProvider;
+import com.yufimtsev.tenhou.clouds.blitz.heroku.BotRunner;
 import com.yufimtsev.tenhou.clouds.logger.Log;
 
 import static spark.Spark.*;
@@ -9,6 +11,7 @@ public class BlitzServer {
 
 
     private static MainProvider mainProvider;
+    private static Gson gson = new Gson();
 
     public static void main(String[] args) {
         Log.d("BlitzServer", "ENTERED INTO MAIN, WHOOHOO!");
@@ -49,6 +52,12 @@ public class BlitzServer {
             } else {
                 return "{\"status\":\"stopped\",\"error\":\"already was stopped\"}";
             }
+        });
+
+        get("/checkUrls", (req, res) -> {
+            Log.resetLogFile();
+            res.type("application/json");
+            return gson.toJson(BotRunner.getCheckUrls());
         });
     }
 
