@@ -8,9 +8,8 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RateLimitException;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class DiscordBot {
 
@@ -115,20 +114,25 @@ public class DiscordBot {
         if (channels.size() == 0) {
             return;
         }
-        for (IVoiceChannel channel : channels) {
-            for (IUser user : channel.getConnectedUsers()) {
-                moveUserToChannel(user, getMuteChannel());
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                for (IVoiceChannel channel : channels) {
+                    for (IUser user : channel.getConnectedUsers()) {
+                        moveUserToChannel(user, getMuteChannel());
+                    }
+                    try {
+                        channel.delete();
+                    } catch (MissingPermissionsException e) {
+                        Log.d(TAG, e);
+                    } catch (RateLimitException e) {
+                        Log.d(TAG, e);
+                    } catch (DiscordException e) {
+                        Log.d(TAG, e);
+                    }
+                }
             }
-            try {
-                channel.delete();
-            } catch (MissingPermissionsException e) {
-                Log.d(TAG, e);
-            } catch (RateLimitException e) {
-                Log.d(TAG, e);
-            } catch (DiscordException e) {
-                Log.d(TAG, e);
-            }
-        }
+        }, TimeUnit.MINUTES.toMillis(1));
     }
 
     public void debugMoveToMute(String discordName, String discriminator) {
