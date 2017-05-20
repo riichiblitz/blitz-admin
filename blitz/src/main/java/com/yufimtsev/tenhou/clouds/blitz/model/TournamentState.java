@@ -67,33 +67,49 @@ public class TournamentState {
 
         wishes.clear();
         possibilityMap.clear();
-        for (Wish wish : state.wish) {
-            if (wish.done != null && wish.done == 0) {
-                long who = Math.min(wish.who, wish.withWhom);
-                long withWhom = Math.max(wish.who, wish.withWhom);
-                ArrayList<Long> wished = null;
-                if (wishes.containsKey(who)) {
-                    wished = wishes.get(who);
-                } else {
-                    wished = new ArrayList<>();
-                    wishes.put(who, wished);
+        state.wish.forEach(this::proceedWish);
+
+        if (state.force != null) {
+            ArrayList<Wish> voiceWishes = new ArrayList<>();
+            for (String namesString : state.force) {
+                String[] names = namesString.split(" ");
+                long who = getPlayerIdByName(names[0]);
+                for (int i = 1, size = names.length; i < size; i++) {
+                    long withWhom = getPlayerIdByName(names[i]);
+                    Wish wish = new Wish(who, withWhom);
+                    wish.done = 0;
+                    voiceWishes.add(wish);
                 }
-                wished.add(withWhom);
             }
 
-            String whoName = getPlayerNameById(wish.who);
-            Integer possibilityCount;
-            if (possibilityMap.containsKey(whoName)) {
-                possibilityCount = possibilityMap.remove(whoName);
-            } else {
-                possibilityCount = 3;
-            }
-            possibilityCount--;
-            possibilityMap.put(whoName, possibilityCount);
-
+            voiceWishes.forEach(this::proceedWish);
         }
 
+    }
 
+    private void proceedWish(Wish wish) {
+        if (wish.done != null && wish.done == 0) {
+            long who = Math.min(wish.who, wish.withWhom);
+            long withWhom = Math.max(wish.who, wish.withWhom);
+            ArrayList<Long> wished = null;
+            if (wishes.containsKey(who)) {
+                wished = wishes.get(who);
+            } else {
+                wished = new ArrayList<>();
+                wishes.put(who, wished);
+            }
+            wished.add(withWhom);
+        }
+
+        String whoName = getPlayerNameById(wish.who);
+        Integer possibilityCount;
+        if (possibilityMap.containsKey(whoName)) {
+            possibilityCount = possibilityMap.remove(whoName);
+        } else {
+            possibilityCount = 3;
+        }
+        possibilityCount--;
+        possibilityMap.put(whoName, possibilityCount);
     }
 
     public synchronized void setPlayers(ArrayList<Player> players) {

@@ -11,5 +11,6 @@ public class InitialState {
     public ArrayList<Player> players;
     public ArrayList<Wish> wish;
     public ArrayList<GameEntity> games;
+    public ArrayList<String> force;
 
 }
