@@ -4,9 +4,12 @@ import com.yufimtsev.tenhou.clouds.blitz.MainProvider;
 import com.yufimtsev.tenhou.clouds.blitz.network.UiTransform;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import java.io.IOException;
 
 public class BotApi {
 
@@ -96,10 +99,22 @@ public class BotApi {
                 });
     }
 
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
     public String getCheckUrl() {
         if (lastId == null) {
             return null;
         }
         return baseUrl + "info?id=" + lastId;
+    }
+
+    public StatusResponse getStatus() {
+        try {
+            return api.getStatus().execute().body();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

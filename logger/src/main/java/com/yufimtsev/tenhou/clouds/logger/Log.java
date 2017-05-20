@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Log {
@@ -13,6 +14,9 @@ public class Log {
 
     private static FileWriter writer;
     private static long logCounter;
+
+    private static ArrayList<String> recyclerBuffer = new ArrayList<String>(1000);
+    private static int recyclerCursor = 0;
 
     static {
         resetLogFile();
@@ -25,12 +29,11 @@ public class Log {
         }
         String logMessage = DATE_TIME_FORMAT.format(new Date()) + " " + tag + ": " + message;
         try {
-            writer.append(logMessage);
+            append(logMessage);
         } catch (IOException e) {
             System.out.println("COULD NOT APPEND TO LOGFILE");
             resetLogFile();
         }
-        System.out.println(logMessage);
     }
 
     public static void d(String tag, Exception exception) {
@@ -40,13 +43,12 @@ public class Log {
         String logMessage = DATE_TIME_FORMAT.format(new Date()) + " " + tag + ": EXCEPTION";
         exception.printStackTrace();
         try {
-            writer.append(logMessage);
-            writer.append(exception.getMessage());
+            append(logMessage);
+            append(exception.getMessage());
         } catch (IOException e) {
             System.out.println("COULD NOT APPEND TO LOGFILE");
             resetLogFile();
         }
-        System.out.println(logMessage);
     }
 
     public static void resetLogFile() {
@@ -70,6 +72,35 @@ public class Log {
             System.out.println("FAILED");
             e.printStackTrace();
         }
+    }
+
+    private static synchronized void append(String log) throws IOException {
+        writer.append(log);
+        if (recyclerBuffer.size() < 1000) {
+            recyclerBuffer.add(log);
+        } else {
+            recyclerBuffer.set(recyclerCursor, log);
+        }
+        recyclerCursor++;
+        if (recyclerCursor == 1000) {
+            recyclerCursor = 0;
+        }
+        System.out.println(log);
+    }
+
+    public static String collect() {
+        StringBuilder result = new StringBuilder();
+        if (recyclerBuffer.size() < 1000) {
+            for (String log : recyclerBuffer) result.append(log).append('\n');
+        } else {
+            for (int i = recyclerCursor + 1; i < 1000; i++) {
+               result.append(recyclerBuffer.get(i)).append('\n');
+            }
+            for (int i = 0; i < recyclerCursor + 1; i++) {
+                result.append(recyclerBuffer.get(i)).append('\n');
+            }
+        }
+        return result.toString();
     }
 
 }

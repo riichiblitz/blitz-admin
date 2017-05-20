@@ -1,12 +1,14 @@
 package com.yufimtsev.tenhou.clouds.blitz.heroku;
 
 import com.yufimtsev.tenhou.clouds.blitz.bot.BotApi;
+import com.yufimtsev.tenhou.clouds.blitz.bot.StatusResponse;
 import com.yufimtsev.tenhou.clouds.blitz.model.Replay;
 import com.yufimtsev.tenhou.clouds.blitz.network.BlitzApi;
 import com.yufimtsev.tenhou.clouds.blitz.network.UiTransform;
 import com.yufimtsev.tenhou.clouds.logger.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -60,4 +62,11 @@ public class BotRunner {
         bots.forEach(bot -> result.add(bot.getCheckUrl()));
         return result;
     }
+
+    public static HashMap<String, StatusResponse> getStatuses() {
+        HashMap<String, StatusResponse> result = new HashMap<>();
+        bots.forEach(bot -> result.put(bot.getBaseUrl(), bot.getStatus()));
+        return result;
+    }
+
 }

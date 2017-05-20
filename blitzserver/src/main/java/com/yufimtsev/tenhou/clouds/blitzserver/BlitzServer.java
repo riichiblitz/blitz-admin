@@ -59,6 +59,18 @@ public class BlitzServer {
             res.type("application/json");
             return gson.toJson(BotRunner.getCheckUrls());
         });
+
+        get("/checkBots", (req, res) -> {
+            Log.resetLogFile();
+            res.type("application/json");
+            return gson.toJson(BotRunner.getStatuses());
+        });
+
+        get("/status", (req, res) -> {
+            Log.resetLogFile();
+            res.type("application/json");
+            return gson.toJson(Log.collect());
+        });
     }
 
     private static int getAssignedPort() {
