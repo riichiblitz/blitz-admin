@@ -157,6 +157,18 @@ public class TournamentState {
     }
 
     public synchronized void gameStarted(ArrayList<Long> table) {
+        outer: for (Long startedPlayer : table) {
+            if (startedPlayer == 0) {
+                continue;
+            }
+            for (int i = 0; i < startedTables.size(); i++) {
+                ArrayList<Long> seating = startedTables.get(i);
+                if (seating.contains(startedPlayer)) {
+                    startedTables.remove(i);
+                    break outer;
+                }
+            }
+        }
         startedTables.add(table);
     }
 
