@@ -2,6 +2,7 @@ package com.yufimtsev.tenhou.clouds.blitz.bot;
 
 import com.yufimtsev.tenhou.clouds.blitz.MainProvider;
 import com.yufimtsev.tenhou.clouds.blitz.network.UiTransform;
+import com.yufimtsev.tenhou.clouds.logger.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Response;
@@ -49,10 +50,11 @@ public class BotApi {
             api.getInfo(lastId).compose(UiTransform.getInstance())
                     .subscribe(info -> {
                         if (info == null || "error".equals(info.status) || "DISCONNECTED".equals(info.status)) {
+                            Log.d(getBaseUrl(), "Error receiving bot info");
                             lastId = null;
-                            lastReplay = null;
                             return;
                         }
+                        Log.d(getBaseUrl(), "Bot info received: " + info.toString() + ", lastReplay was: " + (lastReplay == null ? "null" : lastReplay));
                         lastReplay = info.log;
                     });
         }
@@ -70,7 +72,6 @@ public class BotApi {
                     .subscribe(info -> {
                         if (info == null || "error".equals(info.status) || "DISCONNECTED".equals(info.status)) {
                             lastId = null;
-                            lastReplay = null;
                             startBot();
                         }
                     });
