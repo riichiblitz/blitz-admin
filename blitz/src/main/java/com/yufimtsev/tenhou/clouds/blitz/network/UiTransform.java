@@ -7,7 +7,17 @@ import rx.schedulers.Schedulers;
 public class UiTransform<T extends BaseResponse> implements Observable.Transformer<T, T> {
 
     public static <T extends BaseResponse> UiTransform<T> getInstance() {
-        return new UiTransform<>();
+        return new UiTransform<>(true);
+    }
+
+    public static <T extends BaseResponse> UiTransform<T> getInstance(boolean failIfNotOk) {
+        return new UiTransform<>(failIfNotOk);
+    }
+
+    private final boolean failIfNotOk;
+
+    public UiTransform(boolean failIfNotOk) {
+        this.failIfNotOk = failIfNotOk;
     }
 
     @Override
@@ -17,7 +27,7 @@ public class UiTransform<T extends BaseResponse> implements Observable.Transform
                 .observeOn(Schedulers.newThread())
                 .retryWhen(RetryPolicy.newInstance())
                 .doOnNext(response -> {
-                    if (!"ok".equals(response.status)) {
+                    if (failIfNotOk && !"ok".equals(response.status)) {
                         throw new Error();
                     }
                 })

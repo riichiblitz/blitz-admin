@@ -47,7 +47,7 @@ public class BotApi {
         if (lastId == null) {
             api.hello().compose(UiTransform.getInstance()).subscribe();
         } else {
-            api.getInfo(lastId).compose(UiTransform.getInstance())
+            api.getInfo(lastId).compose(UiTransform.getInstance(false))
                     .subscribe(info -> {
                         if (info == null || "error".equals(info.status) || "DISCONNECTED".equals(info.status)) {
                             Log.d(getBaseUrl(), "Error receiving bot info for id " + lastId);
@@ -70,7 +70,7 @@ public class BotApi {
         if (lastId == null) {
             startBot();
         } else {
-            api.getInfo(lastId).compose(UiTransform.getInstance())
+            api.getInfo(lastId).compose(UiTransform.getInstance(false))
                     .subscribe(info -> {
                         if (info == null || "error".equals(info.status) || "DISCONNECTED".equals(info.status)) {
                             Log.d(getBaseUrl(), "error receiving bot info for " + lastId);

@@ -368,12 +368,12 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
                 break;
             case STATUS_WAIT:
             case STATUS_PAUSE:
-                BlitzApi.getInstance().getUnconfirmedPlayers().compose(new UiTransform<>())
+                BlitzApi.getInstance().getUnconfirmedPlayers().compose(UiTransform.getInstance())
                         .subscribe(new Action1<BaseResponse<ArrayList<String>>>() {
                             @Override
                             public void call(BaseResponse<ArrayList<String>> arrayListBaseResponse) {
                                 if (arrayListBaseResponse == null) {
-                                    BlitzApi.getInstance().getUnconfirmedPlayers().compose(new UiTransform<>())
+                                    BlitzApi.getInstance().getUnconfirmedPlayers().compose(UiTransform.getInstance())
                                             .subscribe(this);
                                 } else {
                                     checkPlayers(arrayListBaseResponse.data);
