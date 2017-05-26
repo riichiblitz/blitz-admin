@@ -107,6 +107,11 @@ public class BlitzServer {
             res.type("application/json");
             return gson.toJson(Log.collect());
         });
+
+        get("/info", (req, res) -> {
+            res.type("application/json");
+            return "{\"status\":\"?\"}";
+        });
     }
 
     private static int getAssignedPort() {
