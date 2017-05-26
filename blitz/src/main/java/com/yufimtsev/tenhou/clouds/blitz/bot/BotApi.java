@@ -50,7 +50,7 @@ public class BotApi {
             api.getInfo(lastId).compose(UiTransform.getInstance())
                     .subscribe(info -> {
                         if (info == null || "error".equals(info.status) || "DISCONNECTED".equals(info.status)) {
-                            Log.d(getBaseUrl(), "Error receiving bot info");
+                            Log.d(getBaseUrl(), "Error receiving bot info for id " + lastId);
                             lastId = null;
                             return;
                         }
@@ -65,12 +65,15 @@ public class BotApi {
     }
 
     public void checkOrStart() {
+        Log.d(getBaseUrl(), "checkOrStart()");
         if (lastId == null) {
             startBot();
         } else {
             api.getInfo(lastId).compose(UiTransform.getInstance())
                     .subscribe(info -> {
                         if (info == null || "error".equals(info.status) || "DISCONNECTED".equals(info.status)) {
+                            Log.d(getBaseUrl(), "error receiving bot info for " + lastId);
+                            Log.d(getBaseUrl(), "detail: " + (info == null ? "null" : info.toString()));
                             lastId = null;
                             startBot();
                         }
@@ -79,11 +82,13 @@ public class BotApi {
     }
 
     private void startBot() {
+        Log.d(getBaseUrl(), "startBot()");
         api.startBot(null, null, MainProvider.LOBBY.substring(0, 9)).compose(UiTransform.getInstance())
                 .subscribe(startResponse -> {
                     if (startResponse == null) {
                         return;
                     }
+                    Log.d(getBaseUrl(), "bot started with id  " + startResponse.id);
                     lastId = startResponse.id;
                     lastReplay = null;
                 });

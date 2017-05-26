@@ -10,6 +10,7 @@ public class InfoResponse extends BaseResponse {
     @Override
     public String toString() {
         return "InfoResponse{" +
+                "status='" + status + '\'' +
                 "message='" + message + '\'' +
                 ", log='" + log + '\'' +
                 '}';
