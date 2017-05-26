@@ -19,11 +19,17 @@ public class SeatingsGenerator {
         }
 
         for (ArrayList<Long> wishedPlayers : wishedTables) {
-            for (Long wishedPlayer : wishedPlayers) {
-                for (int i = 0; i < players.size(); i++) {
-                    if (players.get(i).equals(wishedPlayer)) {
-                        players.remove(i);
-                        i--;
+            for (int i = 0; i < wishedPlayers.size(); i++) {
+                Long wishedPlayer = wishedPlayers.get(i);
+                if (!players.contains(wishedPlayer)) {
+                    wishedPlayers.remove(i);
+                    i--;
+                } else {
+                    for (int j = 0; j < players.size(); j++) {
+                        if (players.get(j).equals(wishedPlayer)) {
+                            players.remove(j);
+                            j--;
+                        }
                     }
                 }
             }
