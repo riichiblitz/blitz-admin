@@ -2,6 +2,7 @@ package com.yufimtsev.tenhou.clouds.blitz.model;
 
 import com.google.gson.Gson;
 import com.yufimtsev.tenhou.clouds.blitz.network.response.Status;
+import com.yufimtsev.tenhou.clouds.logger.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -160,6 +161,8 @@ public class TournamentState {
     }
 
     public synchronized boolean gameEnded(ArrayList<Long> table) {
+        Log.d("TournamentState", "gameEnded(" + table.toString() + ")");
+        Log.d("TournamentState", "startedTables:(" + startedTables.toString() + ")");
         for (int i = 0; i < startedTables.size(); i++) {
             ArrayList<Long> startedTable = startedTables.get(i);
             boolean samePlayers = true;
@@ -174,10 +177,12 @@ public class TournamentState {
                 break;
             }
         }
+        Log.d("TournamentState", "startedTables in result:(" + startedTables.toString() + ")");
         return startedTables.size() == 0;
     }
 
     public ArrayList<ArrayList<Long>> getWishedTables() {
+        Log.d("TournamentState", "getWishedTables()");
         ArrayList<ArrayList<Long>> result = new ArrayList<>();
         for (Long wishing : wishes.keySet()) {
             ArrayList<Long> found = null;
@@ -219,6 +224,7 @@ public class TournamentState {
                 }
             }
         }
+        Log.d("TournamentState", "getWishedTables(): " + result.toString());
         return result;
     }
 

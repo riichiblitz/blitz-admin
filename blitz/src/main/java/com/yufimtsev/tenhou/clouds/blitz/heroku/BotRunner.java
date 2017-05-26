@@ -48,8 +48,10 @@ public class BotRunner {
             if (logHash != null) {
                 Replay replay = new Replay();
                 replay.payload = null;
+                Log.d(bot.getBaseUrl(), "TRY TO SEND REPLAY");
                 replay.url = "http://tenhou.net/0/?log=" + logHash + "&tw=0";
                 replay.cheat = 0;
+                Log.d(bot.getBaseUrl(), "REPLAY URL: " + replay.url);
                 BlitzApi.getInstance().sendReplay(replay).compose(UiTransform.getInstance())
                         .subscribe();
             }
