@@ -3,7 +3,13 @@ package com.yufimtsev.tenhou.clouds.blitzserver;
 import com.google.gson.Gson;
 import com.yufimtsev.tenhou.clouds.blitz.MainProvider;
 import com.yufimtsev.tenhou.clouds.blitz.heroku.BotRunner;
+import com.yufimtsev.tenhou.clouds.blitz.lobby.IStarterCallback;
+import com.yufimtsev.tenhou.clouds.blitz.lobby.Starter;
+import com.yufimtsev.tenhou.clouds.blitz.network.BlitzApi;
+import com.yufimtsev.tenhou.clouds.lobbybot.service.LobbyService;
 import com.yufimtsev.tenhou.clouds.logger.Log;
+
+import java.util.ArrayList;
 
 import static spark.Spark.*;
 
@@ -61,6 +67,39 @@ public class BlitzServer {
 
         get("/checkBots", (req, res) -> {
             res.type("application/json");
+            return gson.toJson(BotRunner.getStatuses());
+        });
+
+        get("/pingBots", (req, res) -> {
+            res.type("application/json");
+            BotRunner.pingBots();
+            return gson.toJson(BotRunner.getStatuses());
+        });
+
+        get("/startBots", (req, res) -> {
+            res.type("application/json");
+            MainProvider.LOBBY = "C1816703204372567";
+            BotRunner.runBots();
+            return gson.toJson(BotRunner.getStatuses());
+        });
+
+        get("/runFakeGame", (req, res) -> {
+            res.type("application/json");
+            MainProvider.LOBBY = "C1816703204372567";
+            MainProvider.CALLBACK_URL = "http://127.0.0.1:4567/";
+            ArrayList<String> names = new ArrayList<>();
+            names.add("NoName");
+            names.add("NoName");
+            names.add("NoName");
+            names.add("NoName");
+            BlitzApi.getInstance();
+            Starter.startGame(MainProvider.LOBBY, null, names, null, new IStarterCallback() {
+                @Override
+                public void onGameStarted(ArrayList<String> players) { }
+
+                @Override
+                public void onMembersNotFound(ArrayList<String> players) { }
+            });
             return gson.toJson(BotRunner.getStatuses());
         });
 
