@@ -51,6 +51,7 @@ public class BotApi {
                     .subscribe(info -> {
                         if (info == null || "error".equals(info.status) || "DISCONNECTED".equals(info.status)) {
                             Log.d(getBaseUrl(), "Error receiving bot info for id " + lastId);
+                            Log.d(getBaseUrl(), "detail: " + (info == null ? "null" : info.toString()));
                             lastId = null;
                             return;
                         }
