@@ -59,7 +59,8 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
     private ArrayList<ArrayList<Long>> pendingBoards;
     private Timer updateTimer;
 
-    public void start(String lobby, String callbackUrl) {
+    public void start(String lobby, String callbackUrl, String payload) {
+        BasePostBody.staticPayload = payload;
         LobbyService instance = LobbyService.getInstance();
         if (instance != null) {
             instance.setOnGameEndedCallback(this);

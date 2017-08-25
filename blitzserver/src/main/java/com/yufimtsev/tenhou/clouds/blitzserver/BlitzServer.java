@@ -30,6 +30,7 @@ public class BlitzServer {
             res.type("application/json");
             String secret = req.queryParams("lobbySecret");
             String apiUrl = req.queryParams("apiUrl");
+            String payload = req.queryParams("payload");
             if (secret == null) {
                 return "{\"status\":\"error\",\"error\":\"lobbySecret query param is not provided\"}";
             }
@@ -38,9 +39,13 @@ public class BlitzServer {
                 return "{\"status\":\"error\",\"error\":\"apiUrl query param is not provided\"}";
             }
 
+            if (payload == null) {
+                return "{\"status\":\"error\",\"error\":\"payload query param is not provided\"}";
+            }
+
             if (mainProvider == null) {
                 mainProvider = new MainProvider();
-                mainProvider.start(secret, apiUrl);
+                mainProvider.start(secret, apiUrl, payload);
                 return "{\"status\":\"ok\"}";
             } else {
                 return "{\"status\":\"none\",\"error\":\"already was started\"}";
