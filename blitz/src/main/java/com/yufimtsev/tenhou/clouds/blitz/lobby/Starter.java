@@ -58,7 +58,7 @@ public class Starter {
             for (Long playerId : seating) {
                 games.add(new GameEntity(TournamentState.getInstance().getStatus().round, board, playerId, null));
                 namesOnBoard.add(TournamentState.getInstance().getPlayerNameById(playerId));
-                startPoints.add(250000);
+                startPoints.add(25000);
             }
 
             startGame(MainProvider.LOBBY, null, namesOnBoard, startPoints, new IStarterCallback() {
