@@ -59,18 +59,13 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
     private ArrayList<ArrayList<Long>> pendingBoards;
     private Timer updateTimer;
 
-    public void start(String lobby, String callbackUrl, String payload) {
+    public void start(String lobby, String callbackUrl, String payload, String discordToken) {
         BasePostBody.staticPayload = payload;
         LobbyService instance = LobbyService.getInstance();
         if (instance != null) {
             instance.setOnGameEndedCallback(this);
         }
-        new Thread() {
-            @Override
-            public void run() {
-                DiscordBot.getInstance().start();
-            }
-        }.start();
+        new Thread(() -> DiscordBot.getInstance(discordToken).start()).start();
         Log.d("MainProvider", "start()");
         LOBBY = lobby;
         CALLBACK_URL = callbackUrl;

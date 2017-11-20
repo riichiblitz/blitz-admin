@@ -6,7 +6,6 @@ import com.yufimtsev.tenhou.clouds.blitz.heroku.BotRunner;
 import com.yufimtsev.tenhou.clouds.blitz.lobby.IStarterCallback;
 import com.yufimtsev.tenhou.clouds.blitz.lobby.Starter;
 import com.yufimtsev.tenhou.clouds.blitz.network.BlitzApi;
-import com.yufimtsev.tenhou.clouds.lobbybot.service.LobbyService;
 import com.yufimtsev.tenhou.clouds.logger.Log;
 
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ public class BlitzServer {
             String secret = req.queryParams("lobbySecret");
             String apiUrl = req.queryParams("apiUrl");
             String payload = req.queryParams("payload");
+            String discordToken = req.queryParams("discordToken");
             if (secret == null) {
                 return "{\"status\":\"error\",\"error\":\"lobbySecret query param is not provided\"}";
             }
@@ -43,9 +43,13 @@ public class BlitzServer {
                 return "{\"status\":\"error\",\"error\":\"payload query param is not provided\"}";
             }
 
+            if (discordToken == null) {
+                return "{\"status\":\"error\",\"error\":\"discordToken query param is not provided\"}";
+            }
+
             if (mainProvider == null) {
                 mainProvider = new MainProvider();
-                mainProvider.start(secret, apiUrl, payload);
+                mainProvider.start(secret, apiUrl, payload, discordToken);
                 return "{\"status\":\"ok\"}";
             } else {
                 return "{\"status\":\"none\",\"error\":\"already was started\"}";

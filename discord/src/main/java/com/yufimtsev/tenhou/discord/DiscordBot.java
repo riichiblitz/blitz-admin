@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class DiscordBot {
 
     private static final String TAG = "DiscordBot";
-    private static final String BOT_TOKEN = "MzAxMjkzNzY2NzU5ODA5MDI0.C9Iiog._-AMS2mqYWpfXJxsoTJhnajeFMA";
+    private final String botToken;
     private IDiscordClient client;
     private IGuild guild;
     private IVoiceChannel muteChannel;
@@ -24,12 +24,17 @@ public class DiscordBot {
 
     private static DiscordBot instance;
 
-    private DiscordBot() {
+    private DiscordBot(String token) {
+        botToken = token;
     }
 
     public static DiscordBot getInstance() {
+        return instance;
+    }
+
+    public static DiscordBot getInstance(String token) {
         if (instance == null) {
-            instance = new DiscordBot();
+            instance = new DiscordBot(token);
         }
         return instance;
     }
@@ -39,7 +44,7 @@ public class DiscordBot {
             return;
         }
         try {
-            client = getClient(BOT_TOKEN, true);
+            client = getClient(botToken, true);
             if (tempAliases != null) {
                 for (String tenhouName : tempAliases.keySet()) {
                     Pair<String, String> discordCredentials = tempAliases.get(tenhouName);
