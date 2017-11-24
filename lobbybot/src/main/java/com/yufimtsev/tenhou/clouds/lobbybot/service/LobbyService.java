@@ -41,7 +41,7 @@ public class LobbyService implements IOnStateChangedCallback, IOnChatMessageRece
                         switch (state) {
                             case CONNECTED:
                                 Log.d("LobbyService", "Loggin with TSUMI? " + isTsumi);
-                                nextClient.authenticate(isTsumi ? "ID2AB2717A-mGBYH553" : "ID6B11619B-HPDJJh2H", null);
+                                nextClient.authenticate(isTsumi ? "ID45407D2B-Xh8GMT3H" : "ID295D3E17-Ld35dL9N", null);
                                 isTsumi = !isTsumi;
                                 break;
                             case IDLE:
