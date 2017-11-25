@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Constants {
     public static final int PLAYER_PER_TABLE = 4;
-    public static final int TOTAL_ROUNDS = 5;
+    public static final int TOTAL_ROUNDS = 4;
 
     //public static final long REGISTRATION_DELAY = TimeUnit.MINUTES.toMillis(3);
     public static final long WAIT_DELAY = TimeUnit.MINUTES.toMillis(60);
