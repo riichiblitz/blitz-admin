@@ -148,6 +148,7 @@ public class DiscordBot {
     }
 
     private IDiscordClient getClient(String token, boolean login) throws DiscordException { // Returns an instance of the Discord client
+        Log.d(TAG, "Auth with token: " + token);
         ClientBuilder clientBuilder = new ClientBuilder(); // Creates the ClientBuilder instance
         clientBuilder.withToken(token); // Adds the login info to the builder
         if (login) {
