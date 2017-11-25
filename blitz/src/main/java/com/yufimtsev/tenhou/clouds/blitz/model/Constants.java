@@ -10,10 +10,10 @@ public class Constants {
     public static final long WAIT_DELAY = TimeUnit.MINUTES.toMillis(60);
     public static final long PLAY_PART_DELAY = TimeUnit.MINUTES.toMillis(5);
     public static final long[] PAUSE_DELAYS = new long[] {
-            TimeUnit.MINUTES.toMillis(5), // after 1st round
-            TimeUnit.MINUTES.toMillis(15), // after 2nd round
-            TimeUnit.MINUTES.toMillis(5), // after 3rd round
-            TimeUnit.MINUTES.toMillis(5), // after 4th round
+            TimeUnit.MINUTES.toMillis(10), // after 1st round
+            TimeUnit.MINUTES.toMillis(30), // after 2nd round
+            TimeUnit.MINUTES.toMillis(10), // after 3rd round
+            TimeUnit.MINUTES.toMillis(10), // after 4th round
             TimeUnit.MINUTES.toMillis(5), // after 5th round
     };
 }
