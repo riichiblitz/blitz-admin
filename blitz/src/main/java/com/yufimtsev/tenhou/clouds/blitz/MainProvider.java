@@ -34,6 +34,7 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
     private ArrayList<String> checkedPlayers = new ArrayList<>();
     private boolean isCheckingPlayers = false;
     private boolean isCheckingLastPlayers = false;
+    private int skipsBeforeConsideredStuck = 3;
 
     private TimerTask newTimerTask() {
         return new TimerTask() {
@@ -431,13 +432,19 @@ public class MainProvider implements IOnPlayersCheckedCallback, IGamesNotStarted
 
     public void checkPlayers(ArrayList<String> playersToCheck) {
         Log.d("MainProvider", "checkPlayers()");
-        if (isCheckingPlayers) {
-            Log.d("MainProvider", "isCheckingPlayers == true, stop checking");
+        if (isCheckingPlayers && !isPlayersCheckingStuck()) {
+            Log.d("MainProvider", "isCheckingPlayers == true and not stuck, stop checking");
             return;
         }
         isCheckingPlayers = true;
+        skipsBeforeConsideredStuck = 3;
         this.playersToCheck = playersToCheck;
         LobbyService.getInstance().updatePlayers();
+    }
+
+    private boolean isPlayersCheckingStuck() {
+        // not good to have this side effect, but who cares
+        return --skipsBeforeConsideredStuck <= 0;
     }
 
     @Override
